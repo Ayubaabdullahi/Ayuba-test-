@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="ha">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Brilliant Footsteps International Academy - Pro SMS</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<style>
+:root {
+    --brand: #004d40; /* Deep Teal for Professional Look */
+    --gold: #ffc107; --success: #2e7d32; --danger: #d32f2f;
+    --card: #ffffff; --shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: #eef2f3; color: #333; min-height: 100vh; }
+
+/* Fixed Layout - Anti-Moving */
+.class-grid { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); 
+    gap: 20px; 
+    padding: 15px;
+    align-items: start;
+}
+
+/* Slide Menu (Hamburger) */
+.menu-toggle { font-size: 30px; cursor: pointer; color: var(--brand); padding: 15px; }
+.slide-menu {
+    position: fixed; top: 0; left: -300px; width: 280px; height: 100vh;
+    background: var(--brand); color: white; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+    z-index: 2000; padding-top: 60px; box-shadow: 5px 0 15px rgba(0,0,0,0.3);
+}
+.slide-menu.active { left: 0; }
+.slide-menu .menu-item { 
+    padding: 15px 25px; font-size: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); 
+    cursor: pointer; display: block; text-decoration: none; color: white;
+}
+.slide-menu .menu-item:hover { background: rgba(255,255,255,0.1); }
+
+/* Header & Branding */
+.main-header { background: white; padding: 20px; text-align: center; border-bottom: 4px solid var(--gold); }
+.logo-box img { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 2px solid var(--gold); }
+.school-desc { font-size: 14px; color: #666; max-width: 600px; margin: 10px auto; font-style: italic; line-height: 1.6; }
+
+/* Buttons */
+.btn-create {
+    background: var(--brand); color: white; border: none; padding: 12px 25px;
+    border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s;
+}
+.btn-create:hover { background: #00695c; transform: translateY(-2px); }
+.btn { padding: 12px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; flex: 1; display: flex; align-items: center; justify-content: center; gap: 5px; color: white; }
+.btn-view { background: #0288d1; } .btn-edit { background: var(--gold); color: #000; } .btn-del { background: var(--danger); }
+
+/* Class Cards */
+.class-card { background: var(--card); border-radius: 15px; overflow: hidden; box-shadow: var(--shadow); position: relative; }
+.class-badge { position: absolute; top: 10px; right: 10px; background: var(--gold); font-size: 11px; padding: 4px 8px; border-radius: 5px; font-weight: bold; }
+.class-header { background: var(--brand); color: #fff; padding: 1.5rem; text-align: center; }
+.class-body { padding: 1.5rem; text-align: center; }
+
+/* Footer */
+.school-footer { 
+    background: var(--brand); color: white; text-align: center; 
+    padding: 20px; margin-top: 50px; font-size: 13px; letter-spacing: 1px;
+}
+
+/* Exam Table Styles */
+.exam-header-box { background: white; padding: 25px; border-radius: 15px; text-align: center; margin-bottom: 20px; border: 2px solid var(--brand); }
+.exam-table { width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; margin-bottom: 20px; font-size: 14px; }
+.exam-table th { background: var(--brand); color: white; padding: 12px; }
+.exam-table td { padding: 10px; border: 1px solid #eee; text-align: center; }
+.exam-input { width: 50px; padding: 5px; border: 1px solid #ccc; border-radius: 5px; text-align: center; }
+.error-input { border-color: var(--danger) !important; background: #ffebee; }
+.summary-box { background: var(--brand); color: white; padding: 20px; border-radius: 10px; display: flex; justify-content: space-around; font-weight: bold; }
+
+.page { display: none; padding: 20px; }
+.active { display: block; }
+.modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); align-items: center; justify-content: center; z-index: 3000; }
+.modal-content { background: #fff; padding: 2rem; border-radius: 15px; width: 90%; max-width: 450px; }
+.modal-content input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; }
+
+@media (max-width: 768px) {
+    .class-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div id="slideMenu" class="slide-menu">
+    <span style="position:absolute; top:15px; right:20px; font-size:30px; cursor:pointer;" onclick="toggleMenu()">×</span>
+    <a href="dashboard.html" class="menu-item"><i class="fas fa-th-large"></i> Dashboard</a>
+    <a href="admin-panel.html" class="menu-item"><i class="fas fa-user-shield"></i> Admin Panel</a>
+    <a href="classes.html" class="menu-item"><i class="fas fa-chalkboard-teacher"></i> Classes</a>
+    <a href="check-result.html" class="menu-item"><i class="fas fa-poll"></i> Check Result</a>
+    <a href="online-meeting.html" class="menu-item"><i class="fas fa-video"></i> Online Meeting</a>
+    <a href="help-center.html" class="menu-item"><i class="fas fa-question-circle"></i> Help Center</a>
+    <a href="login.html" class="menu-item" style="margin-top:20px; color:var(--gold);"><i class="fas fa-sign-out-alt"></i> Logout</a>
+</div>
+
+<header class="main-header">
+    <div class="logo-box"><img src="brilliant1.jpg" alt="Logo"></div>
+    <h1 style="color:var(--brand); margin-top:10px;">Brilliant Footsteps International Academy</h1>
+    <p class="school-desc">We combine Qur’anic excellence with modern education to raise disciplined, knowledgeable, and God-conscious future leaders.</p>
+</header>
+
+<div class="main-content">
+    
+    <div id="classPage" class="page active">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+            <i class="fas fa-bars menu-toggle" onclick="toggleMenu()"></i>
+            <button class="btn-create" onclick="checkAdminAction('classModal')">+ Add New Class</button>
+        </div>
+        <div id="classGrid" class="class-grid"></div>
+    </div>
+
+    <div id="studentPage" class="page">
+        <div style="display:flex; gap:15px; align-items:center; margin-bottom:25px;">
+            <button class="btn" style="background:#555; max-width:100px;" onclick="showPage('classPage')"><i class="fas fa-arrow-left"></i> Back</button>
+            <h2 id="currentClassName" style="color:var(--brand)">Class</h2>
+            <button class="btn-create" style="margin-left:auto" onclick="checkAdminAction('studentModal')">+ Register Student</button>
+        </div>
+        <div id="studentList" class="class-grid"></div>
+    </div>
+
+    <div id="examPage" class="page">
+        <div style="display:flex; gap:15px; align-items:center; margin-bottom:20px;">
+            <button class="btn" style="background:#555; max-width:100px;" onclick="showPage('studentPage')"><i class="fas fa-arrow-left"></i> Back</button>
+            <h2 style="color:var(--brand)">Exam Recording</h2>
+        </div>
+
+        <div class="exam-header-box">
+            <h2 style="color:var(--brand)">BRILLIANT FOOTSTEPS ACADEMY</h2>
+            <p style="font-size:12px; font-weight:bold; color:var(--gold);">2026 ACADEMIC SERIES</p>
+            <hr style="margin:10px 0; opacity:0.2;">
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; text-align:left; font-size:13px;">
+                <span><b>Name:</b> <span id="exName">---</span></span>
+                <span><b>ID:</b> <span id="exId">---</span></span>
+                <span><b>Class:</b> <span id="exClass">---</span></span>
+                <span><b>Section:</b> 2026 Series</span>
+            </div>
+        </div>
+
+        <table class="exam-table">
+            <thead>
+                <tr>
+                    <th style="text-align:left; padding-left:15px;">Subject</th>
+                    <th>CA1 (20)</th>
+                    <th>CA2 (20)</th>
+                    <th>Exam (60)</th>
+                    <th>Total</th>
+                    <th>Grade</th>
+                </tr>
+            </thead>
+            <tbody id="examBody"></tbody>
+        </table>
+
+        <div id="calcError" style="color:var(--danger); text-align:center; margin-bottom:10px; font-weight:bold; display:none;">
+            <i class="fas fa-exclamation-triangle"></i> Error: Marks exceed limit!
+        </div>
+
+        <div class="summary-box">
+            <span>TOTAL: <span id="grandTotal">0</span></span>
+            <span>AVG: <span id="average">0</span>%</span>
+        </div>
+
+        <button class="btn-create" style="width:100%; margin-top:20px; height:50px;" onclick="saveExamRecord()">SAVE 2026 RECORD</button>
+    </div>
+</div>
+
+<footer class="school-footer">
+    <p>&copy; 2026 BRILLIANT FOOTSTEPS INTERNATIONAL ACADEMY SOKOTO</p>
+</footer>
+
+<div id="classModal" class="modal">
+    <div class="modal-content">
+        <h3>Class Setup - 2026 Series</h3>
+        <input type="hidden" id="editClassId">
+        <input id="classNameInput" placeholder="e.g. Pri 1a">
+        <input id="classMottoInput" placeholder="Class Motto">
+        <div style="display:flex; gap:10px; margin-top:15px;">
+            <button class="btn" style="background:var(--success)" onclick="saveClass()">Save</button>
+            <button class="btn" style="background:#999" onclick="closeModal('classModal')">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<div id="studentModal" class="modal">
+    <div class="modal-content">
+        <h3 id="stdModalTitle">Student Registry</h3>
+        <input type="hidden" id="editStdId">
+        <input id="sAdm" placeholder="Admission Number">
+        <input id="sName" placeholder="Full Name">
+        <input id="sParent" placeholder="Parent Name">
+        <input id="sPhone" placeholder="Phone Number">
+        <div style="display:flex; gap:10px; margin-top:15px;">
+            <button class="btn" style="background:var(--success)" onclick="saveStudent()">Register</button>
+            <button class="btn" style="background:#999" onclick="closeModal('studentModal')">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
+import { getFirestore, collection, addDoc, getDocs, doc, deleteDoc, updateDoc, query, where, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyDm35w4edp811CsLhyiUSUqlkEt69_BWYU",
+    authDomain: "loginsysterm.firebaseapp.com",
+    projectId: "loginsysterm",
+    storageBucket: "loginsysterm.firebasestorage.app",
+    messagingSenderId: "181422276481",
+    appId: "1:181422276481:web:0a74d8a68c2446a4673280"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+let activeClass = "";
+let activeStudentId = "";
+const subjects = ["Mathematics", "English", "Basic Science", "Social Studies", "Hausa", "Arabic", "IRS", "Computer", "PHE", "Arts"];
+
+const userEmail = localStorage.getItem('userEmail') || "";
+// UPDATED ADMIN EMAIL
+const isAdmin = userEmail === "ayubaabdullahi131@gmail.com";
+
+window.toggleMenu = () => document.getElementById('slideMenu').classList.toggle('active');
+window.closeModal = (id) => document.getElementById(id).style.display = 'none';
+
+/* --- ACCESS LOGIC --- */
+async function hasClassAccess() {
+    if (isAdmin) return true;
+    try {
+        const q = query(collection(db, "teachers"), where("email", "==", userEmail));
+        const snap = await getDocs(q);
+        if (snap.empty) return false;
+        const teacherData = snap.docs[0].data();
+        const allowed = teacherData.allowedClasses || [];
+        return allowed.includes(activeClass);
+    } catch (e) { return false; }
+}
+
+window.checkAdminAction = async (modalId) => {
+    if (modalId === 'classModal') {
+        if (isAdmin) openClassModal();
+        else alert("🛑 Admin (MAJOR) ne kaɗai ke iya ƙara sabon aji.");
+    } else if (modalId === 'studentModal') {
+        const access = await hasClassAccess();
+        if (access) openStudentModal();
+        else alert("🛑 Ba ka da ikon yin rajista a wannan ajin.");
+    }
+};
+
+window.openClassModal = () => {
+    document.getElementById('editClassId').value = "";
+    document.getElementById('classNameInput').value = "";
+    document.getElementById('classMottoInput').value = "";
+    document.getElementById('classModal').style.display = 'flex';
+};
+
+window.openStudentModal = () => {
+    document.getElementById('editStdId').value = "";
+    document.getElementById('sName').value = "";
+    document.getElementById('sAdm').value = "";
+    document.getElementById('sParent').value = "";
+    document.getElementById('sPhone').value = "";
+    document.getElementById('studentModal').style.display = 'flex';
+};
+
+window.showPage = (id) => {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+};
+
+/* CLASS LOGIC - 2026 COLLECTIONS */
+window.loadClasses = async () => {
+    const grid = document.getElementById('classGrid');
+    grid.innerHTML = "<p style='text-align:center'>Loading 2026 Data...</p>";
+    const snap = await getDocs(collection(db, "classes_2026"));
+    const stdSnap = await getDocs(collection(db, "students_2026"));
+    const classes = [];
+    snap.forEach(d => classes.push({ id: d.id, ...d.data() }));
+    
+    const order = ["Pri 1a", "Pri 1b", "Pri 2a", "Pri 2b", "Pri 3a", "Pri 3b", "Pri 4a", "Pri 4b", "Pri 5a", "Pri 5b", "Pri 6a", "Pri 6b", "JSS 1a", "JSS 1b", "JSS 2a", "JSS 2b", "JSS 3a", "JSS 3b", "SSS 1a", "SSS 1b", "SSS 2a", "SSS 2b", "SSS 3a", "SSS 3b"];
+    classes.sort((a, b) => order.indexOf(a.name) - order.indexOf(b.name));
+    
+    grid.innerHTML = "";
+    classes.forEach(c => {
+        const count = stdSnap.docs.filter(s => s.data().className === c.name).length;
+        grid.innerHTML += `
+            <div class="class-card">
+                <span class="class-badge">2026 Series</span>
+                <div class="class-header">
+                    <h2>${c.name}</h2>
+                    <p style="font-size:12px; opacity:0.8">${count} Students Enrolled</p>
+                </div>
+                <div class="class-body">
+                    <button class="btn btn-view" style="width:100%; margin-bottom:10px;" onclick="enterClass('${c.name}')">MANAGE STUDENTS</button>
+                    <div style="display:flex; gap:5px;">
+                        <button class="btn btn-edit" onclick="editClassUI('${c.id}','${c.name}','${c.motto}')">Edit</button>
+                        <button class="btn btn-del" onclick="deleteClass('${c.id}')">Delete</button>
+                    </div>
+                </div>
+            </div>`;
+    });
+};
+
+window.enterClass = async (name) => {
+    activeClass = name;
+    if (isAdmin) { proceedToClass(name); return; }
+    try {
+        const q = query(collection(db, "teachers"), where("email", "==", userEmail));
+        const snap = await getDocs(q);
+        if (snap.empty || !(snap.docs[0].data().allowedClasses || []).includes(name)) {
+            alert(`🛑 Ba ka da izinin shiga ajin ${name}.`); return;
+        }
+        proceedToClass(name);
+    } catch (e) { alert("Error: " + e.message); }
+};
+
+function proceedToClass(name) {
+    document.getElementById('currentClassName').innerText = name + " (2026)";
+    showPage('studentPage');
+    loadStudents();
+}
+
+/* STUDENT LOGIC - 2026 COLLECTIONS */
+window.loadStudents = async () => {
+    const list = document.getElementById('studentList');
+    list.innerHTML = "Loading...";
+    const q = query(collection(db, "students_2026"), where("className", "==", activeClass));
+    const snap = await getDocs(q);
+    list.innerHTML = "";
+    snap.forEach(d => {
+        const s = d.data();
+        list.innerHTML += `
+            <div class="class-card" style="padding:15px; border-left:5px solid var(--brand)">
+                <h3 style="color:var(--brand)">${s.name}</h3>
+                <p style="font-size:12px; color:#666">ID: ${s.admNo} | Parent: ${s.parent}</p>
+                <div style="display:flex; gap:8px; margin-top:15px;">
+                    <button class="btn btn-view" onclick="openExam('${d.id}', '${s.name}', '${s.admNo}')">RECORD</button>
+                    <button class="btn btn-edit" onclick="editStudentUI('${d.id}','${s.name}','${s.admNo}','${s.parent}','${s.phone}')"><i class="fas fa-edit"></i></button>
+                    <button class="btn btn-del" onclick="deleteStudent('${d.id}')"><i class="fas fa-trash"></i></button>
+                </div>
+            </div>`;
+    });
+};
+
+/* --- RESTRICTED ACTIONS --- */
+window.editClassUI = (id, name, motto) => {
+    if (!isAdmin) { alert("🛑 Admin (MAJOR) ne kaɗai ke iya gyara sunan aji."); return; }
+    document.getElementById('editClassId').value = id;
+    document.getElementById('classNameInput').value = name;
+    document.getElementById('classMottoInput').value = motto;
+    document.getElementById('classModal').style.display = 'flex';
+};
+
+window.deleteClass = async (id) => {
+    if (!isAdmin) { alert("🛑 Admin (MAJOR) ne kaɗai ke iya goge aji."); return; }
+    if(confirm("Delete Class?")) { await deleteDoc(doc(db, "classes_2026", id)); loadClasses(); }
+};
+
+window.editStudentUI = async (id, name, adm, parent, phone) => {
+    if (await hasClassAccess()) {
+        document.getElementById('editStdId').value = id;
+        document.getElementById('sName').value = name;
+        document.getElementById('sAdm').value = adm;
+        document.getElementById('sParent').value = parent;
+        document.getElementById('sPhone').value = phone;
+        document.getElementById('studentModal').style.display = 'flex';
+    } else { alert("🛑 Ba ka da ikon gyara dalibi a wannan ajin."); }
+};
+
+window.deleteStudent = async (id) => {
+    if (await hasClassAccess()) {
+        if(confirm("Delete student?")) { await deleteDoc(doc(db, "students_2026", id)); loadStudents(); loadClasses(); }
+    } else { alert("🛑 Ba ka da ikon goge dalibi a wannan ajin."); }
+};
+
+/* EXAM RECORDING - 2026 COLLECTIONS */
+window.openExam = async (id, name, adm) => {
+    if (!(await hasClassAccess())) { alert("🛑 Ba ka da izinin shiga wannan bangaren."); return; }
+    activeStudentId = id;
+    document.getElementById('exName').innerText = name;
+    document.getElementById('exId').innerText = adm;
+    document.getElementById('exClass').innerText = activeClass;
+    
+    // We use admNo as the document ID for results to make search easier
+    const resRef = doc(db, "results_2026", adm);
+    const resSnap = await getDoc(resRef);
+    const past = resSnap.exists() ? resSnap.data().marks : {};
+    
+    const body = document.getElementById('examBody');
+    body.innerHTML = "";
+    subjects.forEach(sub => {
+        const m = past[sub] || { ca1: "", ca2: "", exam: "" };
+        body.innerHTML += `
+            <tr class="exam-row">
+                <td style="text-align:left; font-weight:bold; padding-left:15px;">${sub}</td>
+                <td><input type="number" class="exam-input ca1" value="${m.ca1}" oninput="validate(this, 20)"></td>
+                <td><input type="number" class="exam-input ca2" value="${m.ca2}" oninput="validate(this, 20)"></td>
+                <td><input type="number" class="exam-input exam" value="${m.exam}" oninput="validate(this, 60)"></td>
+                <td class="r-total" style="font-weight:bold; color:var(--brand)">0</td>
+                <td class="r-grade">-</td>
+            </tr>`;
+    });
+    calculate();
+    showPage('examPage');
+};
+
+window.validate = (input, max) => {
+    if(parseFloat(input.value) > max) { input.classList.add('error-input'); document.getElementById('calcError').style.display = 'block'; }
+    else { input.classList.remove('error-input'); document.getElementById('calcError').style.display = 'none'; }
+    calculate();
+};
+
+window.calculate = () => {
+    let grand = 0;
+    document.querySelectorAll('.exam-row').forEach(row => {
+        const c1 = parseFloat(row.querySelector('.ca1').value) || 0;
+        const c2 = parseFloat(row.querySelector('.ca2').value) || 0;
+        const ex = parseFloat(row.querySelector('.exam').value) || 0;
+        const total = c1 + c2 + ex;
+        row.querySelector('.r-total').innerText = total;
+        let grade = "F";
+        if(total >= 70) grade = "A"; else if(total >= 60) grade = "B"; else if(total >= 50) grade = "C"; else if(total >= 40) grade = "D";
+        row.querySelector('.r-grade').innerText = grade;
+        grand += total;
+    });
+    document.getElementById('grandTotal').innerText = grand;
+    document.getElementById('average').innerText = (grand / subjects.length).toFixed(1);
+};
+
+window.saveExamRecord = async () => {
+    if(document.querySelector('.error-input')) return alert("Correct errors!");
+    let marks = {};
+    document.querySelectorAll('.exam-row').forEach(row => {
+        marks[row.cells[0].innerText] = {
+            ca1: row.querySelector('.ca1').value, ca2: row.querySelector('.ca2').value, exam: row.querySelector('.exam').value
+        };
+    });
+    
+    const admNo = document.getElementById('exId').innerText;
+    await setDoc(doc(db, "results_2026", admNo), { 
+        marks, 
+        studentName: document.getElementById('exName').innerText,
+        className: activeClass,
+        updatedAt: new Date() 
+    });
+    alert("Record Saved Successfully! ✅");
+};
+
+/* SAVE LOGIC - 2026 COLLECTIONS */
+window.saveClass = async () => {
+    const id = document.getElementById('editClassId').value;
+    const name = document.getElementById('classNameInput').value;
+    const motto = document.getElementById('classMottoInput').value;
+    if(!name) return;
+    if(id) await updateDoc(doc(db, "classes_2026", id), { name, motto });
+    else await addDoc(collection(db, "classes_2026"), { name, motto });
+    closeModal('classModal'); loadClasses();
+};
+
+window.saveStudent = async () => {
+    const id = document.getElementById('editStdId').value;
+    const data = {
+        name: document.getElementById('sName').value, 
+        admNo: document.getElementById('sAdm').value.toUpperCase().trim(),
+        parent: document.getElementById('sParent').value, 
+        phone: document.getElementById('sPhone').value, 
+        className: activeClass
+    };
+    if(id) await updateDoc(doc(db, "students_2026", id), data);
+    else await addDoc(collection(db, "students_2026"), data);
+    closeModal('studentModal'); loadStudents(); loadClasses();
+};
+
+loadClasses();
+</script>
+</body>
+</html>

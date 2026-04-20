@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Parent Portal - Brilliant Footsteps International Academy</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<style>
+:root {
+    --primary: #003366; /* Deep Royal Blue */
+    --accent: #ffc107;  /* Gold */
+    --secondary: #00509d;
+    --text: #333;
+    --bg: #f0f4f8;
+}
+
+body { 
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+    background: var(--bg); 
+    margin: 0; 
+    color: var(--text);
+}
+
+/* Welcome & Search Section */
+.welcome-container {
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 40px;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+    text-align: center;
+    border-top: 8px solid var(--primary);
+}
+
+.school-logo { 
+    width: 110px; height: 110px; border-radius: 50%; 
+    border: 4px solid var(--accent); margin-bottom: 20px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.welcome-container h2 { color: var(--primary); margin: 0; font-size: 26px; }
+.motto { color: var(--accent); font-weight: bold; font-style: italic; margin-bottom: 15px; display: block; }
+.description { font-size: 15px; color: #555; line-height: 1.6; margin-bottom: 30px; }
+
+.search-box { position: relative; }
+input {
+    width: 100%; padding: 18px; padding-left: 50px;
+    border: 2px solid #e1e8ed; border-radius: 12px;
+    font-size: 16px; outline: none; transition: 0.3s;
+}
+input:focus { border-color: var(--primary); box-shadow: 0 0 10px rgba(0,51,102,0.1); }
+.search-icon { position: absolute; left: 18px; top: 20px; color: #aaa; }
+
+.btn-check {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: white; padding: 18px; border: none; border-radius: 12px;
+    font-weight: bold; cursor: pointer; width: 100%; margin-top: 20px;
+    font-size: 17px; text-transform: uppercase; letter-spacing: 1px;
+    transition: 0.3s;
+}
+.btn-check:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+
+/* --- PRO REPORT CARD DESIGN --- */
+#reportCard {
+    display: none;
+    max-width: 900px;
+    margin: 30px auto;
+    background: white;
+    padding: 50px;
+    border: 2px solid #ddd;
+    box-shadow: 0 0 50px rgba(0,0,0,0.05);
+    background-image: linear-gradient(rgba(255,255,255,0.96), rgba(255,255,255,0.96)), url('brilliant1.jpg');
+    background-size: 400px; background-position: center; background-repeat: no-repeat;
+}
+
+.report-header {
+    display: flex; align-items: center; gap: 20px;
+    border-bottom: 4px solid var(--primary); padding-bottom: 15px; margin-bottom: 25px;
+}
+
+.header-text { flex-grow: 1; text-align: center; }
+.header-text h1 { margin: 0; color: var(--primary); font-size: 28px; text-transform: uppercase; }
+.header-text p { margin: 5px 0; font-size: 14px; font-weight: 600; color: var(--secondary); }
+
+.student-info-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+    margin-bottom: 25px; background: #f8fbff; padding: 20px;
+    border-radius: 10px; border: 1px solid #e1e8ed;
+}
+.info-item { font-size: 14px; border-bottom: 1px dashed #ccc; padding: 5px 0; }
+.info-item b { color: var(--primary); }
+
+.result-table {
+    width: 100%; border-collapse: collapse; margin-bottom: 25px;
+}
+.result-table th { 
+    background: var(--primary); color: white; padding: 15px; 
+    font-size: 13px; text-transform: uppercase;
+}
+.result-table td { padding: 12px; border: 1px solid #dee2e6; text-align: center; font-size: 15px; }
+.subject-col { text-align: left !important; font-weight: bold; background: #fcfcfc; color: var(--primary); padding-left: 20px !important; }
+
+.score-summary {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-top: 30px;
+}
+.summary-card {
+    background: white; border: 2px solid var(--primary); padding: 15px;
+    border-radius: 12px; text-align: center;
+}
+.summary-card span { display: block; font-size: 11px; font-weight: bold; color: #666; margin-bottom: 5px; }
+.summary-card b { font-size: 20px; color: var(--primary); }
+
+.decision-box {
+    margin-top: 25px; padding: 15px; text-align: center;
+    border-radius: 10px; font-weight: bold; font-size: 18px;
+}
+.promoted { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+.retained { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+
+.signature-section {
+    margin-top: 50px; display: flex; justify-content: space-between; align-items: flex-end;
+}
+.sig-box { text-align: center; width: 180px; }
+.sig-line { border-top: 2px solid var(--primary); margin-top: 45px; padding-top: 8px; font-size: 13px; font-weight: bold; }
+
+.print-actions { text-align: center; margin-bottom: 50px; }
+.btn-print {
+    background: #444; color: white; padding: 12px 30px; border: none;
+    border-radius: 8px; cursor: pointer; font-size: 16px; transition: 0.3s;
+}
+
+@media print {
+    body { background: white; }
+    .welcome-container, .print-actions { display: none; }
+    #reportCard { display: block !important; border: none; box-shadow: none; width: 100%; margin: 0; padding: 20px; }
+    .summary-card { border: 1px solid #000; }
+}
+</style>
+</head>
+<body>
+
+<div class="welcome-container">
+    <img src="brilliant1.jpg" alt="Logo" class="school-logo">
+    <h2>Welcome to Parent Portal</h2>
+    <span class="motto">"Knowledge & Discipline for Future Leaders"</span>
+    <p class="description">
+        Dear Parents/Guardians, welcome to the **Brilliant Footsteps International Academy** digital result system. 
+        We are committed to providing transparent and modern educational tracking for our students. 
+        Enter your child's Admission Number below to access the **2026 Academic Series** report.
+    </p>
+
+    <div class="search-box">
+        <i class="fas fa-search search-icon"></i>
+        <input type="text" id="admInput" placeholder="Enter Admission Number (e.g., BF/2026/001)">
+    </div>
+    <button class="btn-check" onclick="fetchResult()">View Report Card</button>
+    <div id="loader" style="display:none; margin-top:15px; color: var(--primary);">
+        <i class="fas fa-circle-notch fa-spin"></i> Processing Request...
+    </div>
+</div>
+
+<div id="reportCard">
+    <div class="report-header">
+        <img src="brilliant1.jpg" width="100" alt="Logo">
+        <div class="header-text">
+            <h1>Brilliant Footsteps International Academy</h1>
+            <p>Sokoto State, Nigeria | Quality Education for Excellence</p>
+            <div style="margin-top: 8px;">
+                <span style="background:var(--primary); color:white; padding:5px 20px; border-radius:50px; font-size:12px; font-weight:bold;">
+                    TERMINAL PERFORMANCE REPORT
+                </span>
+            </div>
+        </div>
+        <img src="brilliant1.jpg" width="100" style="opacity:0">
+    </div>
+
+    <div class="student-info-grid">
+        <div class="info-item"><b>STUDENT NAME:</b> <span id="rName">---</span></div>
+        <div class="info-item"><b>CLASS:</b> <span id="rClass">---</span></div>
+        <div class="info-item"><b>ADMISSION NO:</b> <span id="rAdm">---</span></div>
+        <div class="info-item"><b>SESSION:</b> 2026 Academic Year</div>
+        <div class="info-item"><b>TERM:</b> Second Term</div>
+        <div class="info-item"><b>DATE:</b> April 19, 2026</div>
+    </div>
+
+    <table class="result-table">
+        <thead>
+            <tr>
+                <th class="subject-col">Academic Subject</th>
+                <th>CA 1 (20)</th>
+                <th>CA 2 (20)</th>
+                <th>Exam (60)</th>
+                <th>Total</th>
+                <th>Grade</th>
+            </tr>
+        </thead>
+        <tbody id="resultBody"></tbody>
+    </table>
+
+    <div class="score-summary">
+        <div class="summary-card"><span>TOTAL OBTAINED</span><b id="rTotal">0</b></div>
+        <div class="summary-card"><span>PERCENTAGE (%)</span><b id="rAvg">0</b></div>
+        <div class="summary-card"><span>CLASS POSITION</span><b>---</b></div>
+        <div class="summary-card"><span>GRADE</span><b id="rGradeOverall">-</b></div>
+    </div>
+
+    <div id="decisionLabel" class="decision-box promoted">PROMOTED</div>
+
+    <div style="margin-top:20px; font-size:14px;">
+        <b>Principal's Comment:</b> <span id="rRemark" style="font-style:italic;">---</span>
+    </div>
+
+    <div class="signature-section">
+        <div class="sig-box">
+            <div class="sig-line">Class Teacher</div>
+        </div>
+        <div class="sig-box">
+            <div style="color:var(--primary); font-family: 'Brush Script MT', cursive; font-size:24px;">Major</div>
+            <div class="sig-line">School Administrator</div>
+        </div>
+        <div class="sig-box">
+            <div class="sig-line">Official School Stamp</div>
+        </div>
+    </div>
+</div>
+
+<div class="print-actions">
+    <button class="btn-print" id="printBtn" style="display:none;" onclick="window.print()">
+        <i class="fas fa-print"></i> Print Official Copy
+    </button>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
+import { getFirestore, collection, query, where, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyDm35w4edp811CsLhyiUSUqlkEt69_BWYU",
+    authDomain: "loginsysterm.firebaseapp.com",
+    projectId: "loginsysterm",
+    storageBucket: "loginsysterm.firebasestorage.app",
+    messagingSenderId: "181422276481",
+    appId: "1:181422276481:web:0a74d8a68c2446a4673280"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+window.fetchResult = async () => {
+    const admNo = document.getElementById('admInput').value.trim().toUpperCase();
+    if(!admNo) { alert("Please enter Admission Number"); return; }
+
+    document.getElementById('loader').style.display = 'block';
+    
+    try {
+        // Updated to search in students_2026 collection
+        const q = query(collection(db, "students_2026"), where("admNo", "==", admNo));
+        const snap = await getDocs(q);
+
+        if(snap.empty) {
+            alert("No student found with this Admission Number in the 2026 Series.");
+            document.getElementById('loader').style.display = 'none';
+            return;
+        }
+
+        const studentData = snap.docs[0].data();
+        // Updated to fetch from results_2026 collection using the admNo as key
+        const resSnap = await getDoc(doc(db, "results_2026", admNo));
+        
+        if(!resSnap.exists()) {
+            alert("Results for this student are not yet uploaded for the 2026 term.");
+            document.getElementById('loader').style.display = 'none';
+            return;
+        }
+
+        displayResult(studentData, resSnap.data().marks);
+    } catch (e) { alert("System Error: " + e.message); }
+    document.getElementById('loader').style.display = 'none';
+};
+
+function displayResult(student, marks) {
+    document.getElementById('rName').innerText = student.name;
+    document.getElementById('rAdm').innerText = student.admNo;
+    document.getElementById('rClass').innerText = student.className;
+
+    const body = document.getElementById('resultBody');
+    body.innerHTML = "";
+    let totalScore = 0;
+    let subjectCount = 0;
+
+    for (let sub in marks) {
+        const m = marks[sub];
+        const t = (parseFloat(m.ca1)||0) + (parseFloat(m.ca2)||0) + (parseFloat(m.exam)||0);
+        totalScore += t; subjectCount++;
+
+        let g = "F";
+        if(t >= 70) g = "A"; else if(t >= 60) g = "B"; 
+        else if(t >= 50) g = "C"; else if(t >= 40) g = "D";
+
+        body.innerHTML += `
+            <tr>
+                <td class="subject-col">${sub}</td>
+                <td>${m.ca1||0}</td>
+                <td>${m.ca2||0}</td>
+                <td>${m.exam||0}</td>
+                <td style="font-weight:bold; color:var(--primary)">${t}</td>
+                <td style="font-weight:bold; color:${g==='F'?'#d32f2f':'#2e7d32'}">${g}</td>
+            </tr>`;
+    }
+
+    const avg = subjectCount > 0 ? (totalScore / subjectCount).toFixed(1) : 0;
+    document.getElementById('rTotal').innerText = totalScore;
+    document.getElementById('rAvg').innerText = avg + "%";
+    
+    const decision = document.getElementById('decisionLabel');
+    if(avg >= 40) {
+        decision.innerText = "RESULT STATUS: PROMOTED";
+        decision.className = "decision-box promoted";
+        document.getElementById('rGradeOverall').innerText = avg >= 70 ? "EXCELLENT" : "PASS";
+    } else {
+        decision.innerText = "RESULT STATUS: RETAINED";
+        decision.className = "decision-box retained";
+        document.getElementById('rGradeOverall').innerText = "FAIL";
+    }
+
+    let remark = "";
+    if(avg >= 80) remark = "Outstanding performance! You are a brilliant leader.";
+    else if(avg >= 60) remark = "Very good result. Keep the focus high.";
+    else if(avg >= 40) remark = "Fair result, but you can do better. Focus on weak subjects.";
+    else remark = "Unsatisfactory. Parents are advised to visit the school.";
+
+    document.getElementById('rRemark').innerText = remark;
+    document.querySelector('.welcome-container').style.display = 'none';
+    document.getElementById('reportCard').style.display = 'block';
+    document.getElementById('printBtn').style.display = 'inline-block';
+}
+</script>
+</body>
+</html>

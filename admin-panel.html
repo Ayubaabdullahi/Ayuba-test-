@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="ha">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Panel - Talba Premium SMS</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<style>
+:root {
+    --brand: #003366;
+    --gold: #ffb400;
+    --danger: #ef4444;
+    --gray: #64748b;
+    --blue: #1e40af;
+}
+
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+    margin: 0;
+    padding: 20px;
+}
+
+h2 {
+    color: var(--brand);
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.admin-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+    gap: 20px;
+}
+
+.teacher-card {
+    background: white;
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.teacher-email {
+    font-size: 18px;
+    font-weight: bold;
+    color: var(--brand);
+    margin-bottom: 15px;
+}
+
+.btn {
+    padding: 12px 18px;
+    margin: 5px 3px;
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.btn-del { background: var(--danger); color: white; }
+.btn-disable { background: var(--gray); color: white; }
+.btn-manage { background: var(--gold); color: var(--brand); }
+
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    width: 90%;
+    max-width: 520px;
+}
+
+.class-btn {
+    margin: 8px 6px;
+    padding: 12px 20px;
+    border: 2px solid #e2e8f0;
+    background: white;
+    border-radius: 9999px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s;
+}
+
+.class-btn.active {
+    background: #1e40af;
+    color: white;
+    border-color: #1e40af;
+    box-shadow: 0 0 12px rgba(30, 64, 175, 0.5);
+}
+</style>
+</head>
+<body>
+
+<h2><i class="fas fa-user-shield"></i> Admin Panel - Manage Teachers</h2>
+
+<div id="teachersList" class="admin-grid"></div>
+
+<div id="accessModal" class="modal">
+    <div class="modal-content">
+        <h3>Manage Class Access for</h3>
+        <p id="modalTeacherEmail" style="font-weight:bold; color:#003366; font-size:18px; margin-bottom:20px;"></p>
+        
+        <p><strong>Click to Grant / Revoke Access (Blue = Granted):</strong></p>
+        <div id="classAccessList"></div>
+
+        <div style="margin-top:25px; text-align:center;">
+            <button onclick="closeAccessModal()" style="background:#64748b; color:white; padding:12px 30px; border:none; border-radius:12px;">Close</button>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
+import { getFirestore, collection, getDocs, deleteDoc, doc, updateDoc, arrayUnion, arrayRemove, getDoc } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyDm35w4edp811CsLhyiUSUqlkEt69_BWYU",
+    authDomain: "loginsysterm.firebaseapp.com",
+    projectId: "loginsysterm",
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// 🔐 SECURE ADMIN CHECK FROM FIRESTORE
+async function checkAdminAccess() {
+    const userEmail = localStorage.getItem("userEmail");
+
+    if (!userEmail) {
+        alert("No user logged in");
+        window.location.href = "index.html";
+        return false;
+    }
+
+    try {
+        const adminRef = doc(db, "admins", userEmail);
+        const adminSnap = await getDoc(adminRef);
+
+        if (!adminSnap.exists()) {
+            alert("Access Denied! You are not an admin.");
+            window.location.href = "index.html";
+            return false;
+        }
+
+        return true;
+    } catch (e) {
+        alert("Error checking admin access");
+        return false;
+    }
+}
+
+// LOAD TEACHERS
+async function loadTeachers() {
+    if (!(await checkAdminAccess())) return;
+
+    const container = document.getElementById("teachersList");
+    container.innerHTML = "<p>Loading teachers...</p>";
+
+    try {
+        const snapshot = await getDocs(collection(db, "teachers"));
+
+        if (snapshot.empty) {
+            container.innerHTML = "<p>No teachers registered yet.</p>";
+            return;
+        }
+
+        container.innerHTML = "";
+
+        snapshot.forEach((docSnap) => {
+            const teacher = docSnap.data();
+            const id = docSnap.id;
+            const allowed = teacher.allowedClasses ? teacher.allowedClasses.join(", ") : "No access";
+
+            const card = document.createElement("div");
+            card.className = "teacher-card";
+            card.innerHTML = `
+                <div class="teacher-email">${teacher.email}</div>
+                <div><strong>Allowed Classes:</strong> ${allowed}</div>
+                <div>
+                    <button class="btn btn-del">Delete</button>
+                    <button class="btn btn-disable">Disable All</button>
+                    <button class="btn btn-manage">Manage Access</button>
+                </div>
+            `;
+
+            card.querySelector('.btn-del').addEventListener('click', () => deleteTeacher(id));
+            card.querySelector('.btn-disable').addEventListener('click', () => disableTeacher(id));
+            card.querySelector('.btn-manage').addEventListener('click', () => manageClassAccess(id, teacher.email));
+
+            container.appendChild(card);
+        });
+    } catch (error) {
+        console.error(error);
+        container.innerHTML = "<p style='color:red'>Error loading teachers.</p>";
+    }
+}
+
+// DELETE TEACHER
+window.deleteTeacher = async (id) => {
+    if (confirm("Delete this teacher permanently?")) {
+        await deleteDoc(doc(db, "teachers", id));
+        loadTeachers();
+    }
+};
+
+// DISABLE TEACHER
+window.disableTeacher = async (id) => {
+    if (confirm("Disable all access for this teacher?")) {
+        await updateDoc(doc(db, "teachers", id), { allowedClasses: [] });
+        loadTeachers();
+    }
+};
+
+// MANAGE ACCESS
+window.manageClassAccess = async (teacherId, teacherEmail) => {
+    document.getElementById("modalTeacherEmail").innerText = teacherEmail;
+    document.getElementById("accessModal").style.display = "flex";
+
+    const listDiv = document.getElementById("classAccessList");
+    listDiv.innerHTML = "Loading classes...";
+
+    const classSnap = await getDocs(collection(db, "classes_2026"));
+
+    let allowedClasses = [];
+    const teacherSnap = await getDocs(collection(db, "teachers"));
+    teacherSnap.forEach(d => {
+        if (d.id === teacherId) allowedClasses = d.data().allowedClasses || [];
+    });
+
+    listDiv.innerHTML = "";
+
+    classSnap.forEach((docSnap) => {
+        const className = docSnap.data().name;
+        const isActive = allowedClasses.includes(className);
+
+        const btn = document.createElement("button");
+        btn.className = `class-btn ${isActive ? 'active' : ''}`;
+        btn.textContent = className;
+        btn.onclick = () => toggleClassAccess(teacherId, className, btn);
+        listDiv.appendChild(btn);
+    });
+};
+
+// TOGGLE ACCESS
+window.toggleClassAccess = async (teacherId, className, button) => {
+    const isActive = button.classList.contains("active");
+    const ref = doc(db, "teachers", teacherId);
+
+    if (isActive) {
+        await updateDoc(ref, { allowedClasses: arrayRemove(className) });
+        button.classList.remove("active");
+    } else {
+        await updateDoc(ref, { allowedClasses: arrayUnion(className) });
+        button.classList.add("active");
+    }
+
+    setTimeout(loadTeachers, 500);
+};
+
+// CLOSE MODAL
+window.closeAccessModal = () => {
+    document.getElementById("accessModal").style.display = "none";
+    loadTeachers();
+};
+
+// START
+loadTeachers();
+</script>
+
+</body>
+</html>
