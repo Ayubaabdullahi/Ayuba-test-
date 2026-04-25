@@ -19,10 +19,10 @@ body {
     font-family: 'Segoe UI', sans-serif;
     background: linear-gradient(135deg, #f8fafc, #e2e8f0);
     margin: 0;
-    padding: 0;
+    padding: 0; /* Na cire padding na body don header ya zauna yadda ya kamata */
 }
 
-/* --- HEADER --- */
+/* --- SABON GYARA NA HEADER DA HAMBURGER --- */
 header.top-nav {
     background: var(--brand);
     color: white;
@@ -90,23 +90,88 @@ header.top-nav {
     color: var(--gold);
 }
 
-/* --- MAIN CONTENT & OTHERS --- */
+/* --- SAURAN CSS DIN KA NA ASALI --- */
 .main-content { padding: 20px; }
-h2 { color: var(--brand); text-align: center; margin-bottom: 30px; }
-.admin-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 20px; }
-.teacher-card { background: white; border-radius: 20px; padding: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
-.teacher-email { font-size: 18px; font-weight: bold; color: var(--brand); margin-bottom: 15px; }
-.btn { padding: 12px 18px; margin: 5px 3px; border: none; border-radius: 12px; font-weight: 600; cursor: pointer; font-size: 15px; }
+
+h2 {
+    color: var(--brand);
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.admin-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+    gap: 20px;
+}
+
+.teacher-card {
+    background: white;
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.teacher-email {
+    font-size: 18px;
+    font-weight: bold;
+    color: var(--brand);
+    margin-bottom: 15px;
+}
+
+.btn {
+    padding: 12px 18px;
+    margin: 5px 3px;
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 15px;
+}
+
 .btn-del { background: var(--danger); color: white; }
 .btn-disable { background: var(--gray); color: white; }
 .btn-manage { background: var(--gold); color: var(--brand); }
 
-.modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); align-items: center; justify-content: center; z-index: 1100; }
-.modal-content { background: white; padding: 30px; border-radius: 20px; width: 90%; max-width: 520px; }
-.class-btn { margin: 8px 6px; padding: 12px 20px; border: 2px solid #e2e8f0; background: white; border-radius: 9999px; cursor: pointer; font-weight: 500; transition: all 0.3s; }
-.class-btn.active { background: #1e40af; color: white; border-color: #1e40af; box-shadow: 0 0 12px rgba(30, 64, 175, 0.5); }
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    align-items: center;
+    justify-content: center;
+    z-index: 1100;
+}
 
-@media (max-width: 500px) { .admin-grid { grid-template-columns: 1fr; } }
+.modal-content {
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    width: 90%;
+    max-width: 520px;
+}
+
+.class-btn {
+    margin: 8px 6px;
+    padding: 12px 20px;
+    border: 2px solid #e2e8f0;
+    background: white;
+    border-radius: 9999px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s;
+}
+
+.class-btn.active {
+    background: #1e40af;
+    color: white;
+    border-color: #1e40af;
+    box-shadow: 0 0 12px rgba(30, 64, 175, 0.5);
+}
+
+@media (max-width: 500px) {
+    .admin-grid { grid-template-columns: 1fr; }
+}
 </style>
 </head>
 <body>
@@ -136,8 +201,10 @@ h2 { color: var(--brand); text-align: center; margin-bottom: 30px; }
     <div class="modal-content">
         <h3>Manage Class Access for</h3>
         <p id="modalTeacherEmail" style="font-weight:bold; color:#003366; font-size:18px; margin-bottom:20px;"></p>
+        
         <p><strong>Click to Grant / Revoke Access (Blue = Granted):</strong></p>
         <div id="classAccessList"></div>
+
         <div style="margin-top:25px; text-align:center;">
             <button onclick="closeAccessModal()" style="background:#64748b; color:white; padding:12px 30px; border:none; border-radius:12px;">Close</button>
         </div>
@@ -145,8 +212,18 @@ h2 { color: var(--brand); text-align: center; margin-bottom: 30px; }
 </div>
 
 <script>
+    // HAMBURGER TOGGLE SCRIPT
     document.getElementById('hambtn').addEventListener('click', () => {
         document.getElementById('sidebar').classList.toggle('active');
+    });
+
+    // Close sidebar if clicked outside (optional but good for UX)
+    window.addEventListener('click', (e) => {
+        const sidebar = document.getElementById('sidebar');
+        const hambtn = document.getElementById('hambtn');
+        if (!sidebar.contains(e.target) && !hambtn.contains(e.target) && sidebar.classList.contains('active')) {
+            sidebar.classList.remove('active');
+        }
     });
 </script>
 
@@ -163,7 +240,8 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// Logic din Firestore dinka yana nan yadda yake
+// ... (SAURAN FIRESTORE FUNCTIONS DIN KA KAMAR YADDA SUKE) ...
+
 async function checkAdminAccess() {
     const userEmail = localStorage.getItem("userEmail");
     if (!userEmail) { alert("No user logged in"); window.location.href = "index.html"; return false; }
