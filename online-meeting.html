@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Meeting - Brilliant Academy</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --brand: #003366;
+            --gold: #ffb400;
+            --dark-blue: #001f3f;
+            --white: #ffffff;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: 'Segoe UI', sans-serif;
+            background-color: var(--dark-blue);
+            color: var(--white);
+            overflow: hidden;
+        }
+
+        /* Top Navigation */
+        header.top-nav {
+            background: var(--brand);
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 2px solid var(--gold);
+            position: sticky;
+            top: 0;
+            z-index: 1001;
+        }
+
+        .nav-left { display: flex; align-items: center; gap: 15px; }
+
+        .hamburger-btn {
+            background: var(--gold);
+            color: var(--brand);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .school-name {
+            font-weight: 800;
+            font-size: 1.1rem;
+            color: var(--gold);
+            text-transform: uppercase;
+        }
+
+        /* Sidebar Menu */
+        .sidebar {
+            position: fixed;
+            left: -300px;
+            top: 0;
+            width: 280px;
+            height: 100%;
+            background: var(--brand);
+            padding-top: 80px;
+            transition: 0.4s ease;
+            z-index: 1000;
+            box-shadow: 5px 0 25px rgba(0,0,0,0.4);
+        }
+
+        .sidebar.active { left: 0; }
+
+        .sidebar a {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px 25px;
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .sidebar a i { color: var(--gold); width: 20px; text-align: center; }
+        .sidebar a:hover { background: rgba(255,180,0,0.1); color: var(--gold); }
+
+        /* Meeting Frame */
+        .meeting-container {
+            width: 100%;
+            height: calc(100vh - 72px);
+            position: relative;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: #000;
+        }
+
+        #loader {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top: 4px solid var(--gold);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+<header class="top-nav">
+    <div class="nav-left">
+        <button class="hamburger-btn" id="hambtn">
+            <i class="fas fa-bars"></i>
+        </button>
+        <span class="school-name">Brilliant Academy online meeting</span>
+    </div>
+    <div style="font-size: 0.8rem; color: var(--gold); border: 1px solid var(--gold); padding: 4px 10px; border-radius: 15px;">
+        <i class="fas fa-circle" style="font-size: 8px; color: #00ff00;"></i> LIVE
+    </div>
+</header>
+
+<nav class="sidebar" id="sidebar">
+    <a href="Index.html"><i class="fas fa-home"></i> Home</a>
+    <a href="check-result.html"><i class="fas fa-poll"></i> Check Result</a>
+    <a href="admin-panel.html"><i class="fas fa-user-shield"></i> Admin Panel</a>
+    <a href="help.html"><i class="fas fa-question-circle"></i> Help Support</a>
+</nav>
+
+<div class="meeting-container">
+    <div id="loader">
+        <div class="spinner"></div>
+        <p>Connecting to classroom...</p>
+    </div>
+
+    <iframe 
+        src="https://meet.jit.si/maahaduschoolonlinemeeting#config.prejoinPageEnabled=false" 
+        allow="camera; microphone; display-capture; fullscreen; clipboard-read; clipboard-write"
+        onload="document.getElementById('loader').style.display='none';">
+    </iframe>
+</div>
+
+<script>
+    const hambtn = document.getElementById('hambtn');
+    const sidebar = document.getElementById('sidebar');
+
+    hambtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        sidebar.classList.toggle('active');
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!sidebar.contains(e.target) && sidebar.classList.contains('active')) {
+            sidebar.classList.remove('active');
+        }
+    });
+</script>
+
+</body>
+</html>
